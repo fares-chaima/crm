@@ -97,9 +97,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="mb-3">
                 <label>Photo</label>
-                <?php if ($visit['photo_url']): ?>
-                    <div class="mb-2"><img src="../<?= $visit['photo_url'] ?>" width="100"></div>
-                <?php endif; ?>
+                <?php 
+                if ($visit['photo_url']) {
+                    $photo = $visit['photo_url'];
+                    $src = (strpos($photo, 'uploads/') === 0) ? "../$photo" : "../uploads/$photo";
+                    echo '<div class="mb-2"><img src="' . htmlspecialchars($src) . '" width="150" class="rounded border"></div>';
+                }
+                ?>
                 <input type="file" name="photo" class="form-control" accept="image/*">
             </div>
             <button type="submit" class="btn btn-primary w-100">Mettre à jour</button>
@@ -112,7 +116,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const lat = <?= $visit['latitude'] ?>;
     const lng = <?= $visit['longitude'] ?>;
     const map = L.map('map-view').setView([lat, lng], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: 'Map data &copy; Google'
+    }).addTo(map);
     L.marker([lat, lng]).addTo(map);
 });
 </script>

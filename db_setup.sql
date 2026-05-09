@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS profiles (
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
     role ENUM('admin', 'rep') DEFAULT 'rep',
+    view_city_visits BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -143,10 +143,20 @@ body {
     box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
 }
 
+.form-select option {
+    background-color: white;
+    color: black;
+}
+
 .form-label {
     margin-bottom: 8px;
     font-weight: 500;
     color: var(--text-muted);
+}
+
+.form-control::placeholder, .form-select::placeholder {
+    color: #ffffff !important;
+    opacity: 0.9 !important;
 }
 
 /* Button Styling Refinements */
