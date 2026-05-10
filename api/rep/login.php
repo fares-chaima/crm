@@ -27,5 +27,6 @@ apiJsonResponse([
         'email' => $user['email'],
         'full_name' => $user['full_name'],
         'role' => $user['role'],
+        'view_city_visits' => (bool) $user['view_city_visits'],
     ],
 ]);

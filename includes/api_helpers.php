@@ -120,6 +120,14 @@ function repGetResponses(PDO $pdo): array
     return $stmt->fetchAll();
 }
 
+function repCanViewCityVisits(PDO $pdo, int $repId): bool
+{
+    $stmt = $pdo->prepare('SELECT view_city_visits FROM profiles WHERE id = ?');
+    $stmt->execute([$repId]);
+
+    return (bool) $stmt->fetchColumn();
+}
+
 function repBuildVisitsFilters(array $queryParams, int $repId): array
 {
     $where = ['v.created_by = ?'];
@@ -157,7 +165,52 @@ function repBuildVisitsFilters(array $queryParams, int $repId): array
 
 function repFetchVisits(PDO $pdo, array $queryParams, int $repId): array
 {
-    [$where, $params] = repBuildVisitsFilters($queryParams, $repId);
+    $where = [];
+    $params = [];
+    $canViewCityVisits = repCanViewCityVisits($pdo, $repId);
+
+    if ($canViewCityVisits) {
+        $assignedCityIds = repGetAssignedCityIds($pdo, $repId);
+
+        if (!empty($assignedCityIds)) {
+            $placeholders = implode(',', array_fill(0, count($assignedCityIds), '?'));
+            $where = ["v.city_id IN ($placeholders)"];
+            $params = $assignedCityIds;
+        } else {
+            $where = ['v.created_by = ?'];
+            $params = [$repId];
+        }
+    } else {
+        $where = ['v.created_by = ?'];
+        $params = [$repId];
+    }
+
+    if (!empty($queryParams['city_id'])) {
+        $where[] = 'v.city_id = ?';
+        $params[] = (int) $queryParams['city_id'];
+    }
+
+    if (!empty($queryParams['response_id'])) {
+        $where[] = 'v.response_id = ?';
+        $params[] = (int) $queryParams['response_id'];
+    }
+
+    if (!empty($queryParams['period'])) {
+        switch ($queryParams['period']) {
+            case 'today':
+                $where[] = 'DATE(v.created_at) = CURDATE()';
+                break;
+            case 'yesterday':
+                $where[] = 'DATE(v.created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)';
+                break;
+            case 'week':
+                $where[] = 'v.created_at >= DATE_SUB(CURDATE(), INTERVAL(WEEKDAY(CURDATE())) DAY)';
+                break;
+            case 'month':
+                $where[] = "v.created_at >= DATE_FORMAT(CURDATE(), '%Y-%m-01')";
+                break;
+        }
+    }
 
     $query = 'SELECT v.*, p.full_name AS rep_name, p.email AS created_by_email, c.name AS city_name, r.label AS response_label, r.color AS response_color
               FROM visits v
