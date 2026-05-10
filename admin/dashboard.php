@@ -176,8 +176,10 @@ $visits = $stmt->fetchAll();
                             <td>
                                 <?php 
                                 $photo = $visit['photo_url'];
-                                if ($photo) {
-                                    $src = (strpos($photo, 'uploads/') === 0) ? "../$photo" : "../uploads/$photo";
+                                if (!empty($photo)) {
+                                    // Normaliser le chemin (s'assurer qu'il commence par "uploads/")
+                                    $normalizedPhoto = (strpos($photo, 'uploads/') === 0) ? $photo : 'uploads/' . basename($photo);
+                                    $src = "../" . $normalizedPhoto;
                                 } else {
                                     $src = "https://placehold.co/60x60?text=No+Photo";
                                 }

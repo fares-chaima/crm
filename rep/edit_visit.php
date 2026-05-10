@@ -98,9 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mb-3">
                 <label>Photo</label>
                 <?php 
-                if ($visit['photo_url']) {
+                if (!empty($visit['photo_url'])) {
                     $photo = $visit['photo_url'];
-                    $src = (strpos($photo, 'uploads/') === 0) ? "../$photo" : "../uploads/$photo";
+                    // Normaliser le chemin (s'assurer qu'il commence par "uploads/")
+                    $normalizedPhoto = (strpos($photo, 'uploads/') === 0) ? $photo : 'uploads/' . basename($photo);
+                    $src = "../" . $normalizedPhoto;
                     echo '<div class="mb-2"><img src="' . htmlspecialchars($src) . '" width="150" class="rounded border"></div>';
                 }
                 ?>

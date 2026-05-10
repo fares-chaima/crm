@@ -196,3 +196,35 @@ function repEnsureCityAllowed(PDO $pdo, int $repId, int $cityId): void
         apiJsonResponse(['success' => false, 'error' => 'Ville non autorisee'], 403);
     }
 }
+
+function repHandleUploadedPhoto(string $fieldName = 'photo', ?string $currentPhotoUrl = null): ?string
+{
+    if (!isset($_FILES[$fieldName]) || ($_FILES[$fieldName]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return $currentPhotoUrl;
+    }
+
+    if (($_FILES[$fieldName]['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        apiJsonResponse(['success' => false, 'error' => 'Upload photo impossible'], 422);
+    }
+
+    $extension = strtolower(pathinfo($_FILES[$fieldName]['name'] ?? '', PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'heic'];
+
+    if (!$extension || !in_array($extension, $allowedExtensions, true)) {
+        apiJsonResponse(['success' => false, 'error' => 'Format photo non supporte'], 422);
+    }
+
+    $uploadDirectory = dirname(__DIR__) . '/uploads';
+    if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0775, true) && !is_dir($uploadDirectory)) {
+        apiJsonResponse(['success' => false, 'error' => 'Dossier upload indisponible'], 500);
+    }
+
+    $fileName = uniqid('visit_', true) . '.' . $extension;
+    $targetPath = $uploadDirectory . '/' . $fileName;
+
+    if (!move_uploaded_file($_FILES[$fieldName]['tmp_name'], $targetPath)) {
+        apiJsonResponse(['success' => false, 'error' => 'Enregistrement photo impossible'], 500);
+    }
+
+    return 'uploads/' . $fileName;
+}

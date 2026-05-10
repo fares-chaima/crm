@@ -9,7 +9,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 }
 
 $data = apiGetRequestData();
-repValidateRequiredFields($data, ['id', 'doctor_name', 'city_id', 'response_id']);
+repValidateRequiredFields($data, ['id', 'doctor_name', 'latitude', 'longitude', 'city_id', 'response_id']);
 
 $visitId = (int) $data['id'];
 $visit = repFetchVisitById($pdo, $visitId, $repId);
@@ -18,19 +18,23 @@ if (!$visit) {
 }
 
 repEnsureCityAllowed($pdo, $repId, (int) $data['city_id']);
+$photoUrl = repHandleUploadedPhoto('photo', $visit['photo_url'] ?? null);
 
 $stmt = $pdo->prepare(
     'UPDATE visits
-     SET doctor_name = ?, phone_number = ?, address = ?, city_id = ?, response_id = ?, comment = ?, last_edited_at = NOW()
+     SET doctor_name = ?, phone_number = ?, address = ?, latitude = ?, longitude = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, last_edited_at = NOW()
      WHERE id = ? AND created_by = ?'
 );
 $stmt->execute([
     $data['doctor_name'],
     $data['phone_number'] ?? null,
     $data['address'] ?? null,
+    $data['latitude'],
+    $data['longitude'],
     (int) $data['city_id'],
     (int) $data['response_id'],
     $data['comment'] ?? null,
+    $photoUrl,
     $visitId,
     $repId,
 ]);
