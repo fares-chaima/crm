@@ -22,7 +22,7 @@ $photoUrl = repHandleUploadedPhoto('photo', $visit['photo_url'] ?? null);
 
 $stmt = $pdo->prepare(
     'UPDATE visits
-     SET doctor_name = ?, phone_number = ?, address = ?, latitude = ?, longitude = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, last_edited_at = NOW()
+    SET doctor_name = ?, phone_number = ?, address = ?, latitude = ?, longitude = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, visit_count = COALESCE(visit_count, 0) + 1, last_edited_at = NOW()
      WHERE id = ? AND created_by = ?'
 );
 $stmt->execute([

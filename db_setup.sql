@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS visits (
     response_id INT NOT NULL,
     comment TEXT,
     photo_url VARCHAR(255),
+    visit_count INT NOT NULL DEFAULT 1,
     created_by INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_edited_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,

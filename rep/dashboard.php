@@ -104,7 +104,7 @@ $visits = $stmt->fetchAll();
         <div class="tab-pane fade show active" id="listView" role="tabpanel">
             <div class="table-responsive">
                 <table class="table table-dark table-striped table-hover align-middle">
-                    <thead><tr><th>Photo</th><th>Docteur / Tél</th><th>Adresse</th><th>Ville</th><th>Réponse</th><th>Commentaire</th><th>Dates</th><th>Actions</th><th class="text-center"><i class="bi bi-check2-square"></i></th></tr></thead>
+                    <thead><tr><th>Photo</th><th>Docteur / Tél</th><th>Adresse</th><th>Ville</th><th>Réponse</th><th>Visite</th><th>Commentaire</th><th>Dates</th><th>Actions</th><th class="text-center"><i class="bi bi-check2-square"></i></th></tr></thead>
                     <tbody><?php foreach ($visits as $visit): ?>
                         <tr><td>
                             <?php 
@@ -123,6 +123,7 @@ $visits = $stmt->fetchAll();
                             <td class="small"><div style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($visit['address'] ?? '-') ?></div></td>
                             <td><?= htmlspecialchars($visit['city_name']) ?></td>
                             <td><span class="badge" style="background-color: <?= $visit['response_color'] ?>"><?= htmlspecialchars($visit['response_label']) ?></span></td>
+                            <td><span class="badge bg-info text-dark">#<?= (int) ($visit['visit_count'] ?? 1) ?></span></td>
                             <td class="small"><div style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($visit['comment'] ?? '-') ?></div></td>
                             <td class="small"><div>Créé: <?= $visit['created_at'] ?></div><div>Modif: <?= $visit['last_edited_at'] ?? 'Jamais' ?></div></td>
                             <td>

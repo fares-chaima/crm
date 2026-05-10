@@ -63,7 +63,7 @@ if ($method === 'GET') {
         exit;
     }
     
-    $stmt = $pdo->prepare("INSERT INTO visits (doctor_name, phone_number, address, latitude, longitude, city_id, response_id, comment, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO visits (doctor_name, phone_number, address, latitude, longitude, city_id, response_id, comment, visit_count, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $success = $stmt->execute([
         $data['doctor_name'],
         $data['phone_number'] ?? null,
@@ -73,6 +73,7 @@ if ($method === 'GET') {
         $data['city_id'],
         $data['response_id'],
         $data['comment'] ?? null,
+        1,
         $user['id']
     ]);
     

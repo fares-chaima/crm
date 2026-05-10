@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("INSERT INTO visits (doctor_name, phone_number, address, latitude, longitude, city_id, response_id, comment, photo_url, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$doctor_name, $phone, $address, $lat, $lng, $city_id, $response_id, $comment, $photo_url, $rep_id]);
+    $stmt = $pdo->prepare("INSERT INTO visits (doctor_name, phone_number, address, latitude, longitude, city_id, response_id, comment, photo_url, visit_count, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$doctor_name, $phone, $address, $lat, $lng, $city_id, $response_id, $comment, $photo_url, 1, $rep_id]);
     
     header('Location: dashboard.php?msg=Visit added');
     exit;

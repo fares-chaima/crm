@@ -57,7 +57,7 @@ header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="visits_export_' . date('Y-m-d') . '.csv"');
 
 $output = fopen('php://output', 'w');
-fputcsv($output, ['doctor_name', 'phone_number', 'address', 'latitude', 'longitude', 'city', 'response', 'comment', 'photo_url', 'created_by_email', 'created_at', 'last_edited_at']);
+    fputcsv($output, ['doctor_name', 'phone_number', 'address', 'latitude', 'longitude', 'city', 'response', 'visit_count', 'comment', 'photo_url', 'created_by_email', 'created_at', 'last_edited_at']);
 
 foreach ($visits as $v) {
     fputcsv($output, [
@@ -68,6 +68,7 @@ foreach ($visits as $v) {
         $v['longitude'],
         $v['city_name'],
         $v['response_label'],
+        $v['visit_count'] ?? 1,
         $v['comment'],
         $v['photo_url'],
         $v['created_by_email'],

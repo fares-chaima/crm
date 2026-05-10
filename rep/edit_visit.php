@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("UPDATE visits SET doctor_name = ?, phone_number = ?, address = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, last_edited_at = NOW() WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE visits SET doctor_name = ?, phone_number = ?, address = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, visit_count = COALESCE(visit_count, 0) + 1, last_edited_at = NOW() WHERE id = ?");
     $stmt->execute([$doctor_name, $phone, $address, $city_id, $response_id, $comment, $photo_url, $visit_id]);
     
     header('Location: dashboard.php?msg=Visit updated');
@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="col-md-6 offset-md-3">
         <h3>Editer Visite</h3>
         <p class="text-muted small">Créé le: <?= $visit['created_at'] ?> | Dernière modif: <?= $visit['last_edited_at'] ?? 'Jamais' ?></p>
+        <p class="text-muted small">Nombre de visite: <?= (int) ($visit['visit_count'] ?? 1) ?></p>
         <form action="edit_visit.php?id=<?= $visit_id ?>" method="POST" enctype="multipart/form-data">
             <div class="mb-2">
                 <label>Nom du Docteur *</label>

@@ -162,6 +162,7 @@ $visits = $stmt->fetchAll();
                         <th>Adresse</th>
                         <th><a href="?<?= http_build_query(array_merge($_GET, ['sort_by' => 'city_name', 'sort_order' => $sort_order == 'ASC' ? 'DESC' : 'ASC'])) ?>" class="text-white">Ville</a></th>
                         <th>Réponse</th>
+                        <th>Visite</th>
                         <th>Commentaire</th>
                         <th>Commercial</th>
                         <th><a href="?<?= http_build_query(array_merge($_GET, ['sort_by' => 'v.created_at', 'sort_order' => $sort_order == 'ASC' ? 'DESC' : 'ASC'])) ?>" class="text-white">Date</a></th>
@@ -191,6 +192,7 @@ $visits = $stmt->fetchAll();
                             <td class="small"><?= htmlspecialchars($visit['address'] ?? '-') ?></td>
                             <td><?= htmlspecialchars($visit['city_name']) ?></td>
                             <td><span class="badge" style="background-color: <?= $visit['response_color'] ?>"><?= htmlspecialchars($visit['response_label']) ?></span></td>
+                            <td><span class="badge bg-info text-dark">#<?= (int) ($visit['visit_count'] ?? 1) ?></span></td>
                             <td class="small text-white opacity-75" title="<?= htmlspecialchars($visit['comment']) ?>">
                                 <div style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     <?= htmlspecialchars($visit['comment'] ?? '-') ?>
