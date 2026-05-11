@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lng = $_POST['longitude'];
     $city_id = $_POST['city_id'];
     $response_id = $_POST['response_id'];
+    $visit_count = isset($_POST['visit_count']) ? max(1, (int) $_POST['visit_count']) : 1;
     $comment = $_POST['comment'];
     
     // Server-side check: Ensure the rep is adding to an assigned city
@@ -37,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt = $pdo->prepare("INSERT INTO visits (doctor_name, phone_number, address, latitude, longitude, city_id, response_id, comment, photo_url, visit_count, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$doctor_name, $phone, $address, $lat, $lng, $city_id, $response_id, $comment, $photo_url, 1, $rep_id]);
+    $stmt->execute([$doctor_name, $phone, $address, $lat, $lng, $city_id, $response_id, $comment, $photo_url, $visit_count, $rep_id]);
     
     header('Location: dashboard.php?msg=Visit added');
     exit;
@@ -87,6 +88,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php foreach($responses as $resp): ?>
                         <option value="<?= $resp['id'] ?>"><?= htmlspecialchars($resp['label']) ?></option>
                     <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label>Numéro de visite *</label>
+                <select name="visit_count" class="form-select" required>
+                    <?php for ($i = 1; $i <= 10; $i++): ?>
+                        <option value="<?= $i ?>"><?= $i ?></option>
+                    <?php endfor; ?>
                 </select>
             </div>
             <div class="mb-2">

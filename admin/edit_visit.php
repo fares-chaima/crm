@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = $_POST['address'];
     $city_id = $_POST['city_id'];
     $response_id = $_POST['response_id'];
+    $visit_count = isset($_POST['visit_count']) ? max(1, (int) $_POST['visit_count']) : 1;
     $comment = $_POST['comment'];
     
     $photo_url = $visit['photo_url'];
@@ -35,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("UPDATE visits SET doctor_name = ?, phone_number = ?, address = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, last_edited_at = NOW() WHERE id = ?");
-    $stmt->execute([$doctor_name, $phone, $address, $city_id, $response_id, $comment, $photo_url, $visit_id]);
+    $stmt = $pdo->prepare("UPDATE visits SET doctor_name = ?, phone_number = ?, address = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, visit_count = ?, last_edited_at = NOW() WHERE id = ?");
+    $stmt->execute([$doctor_name, $phone, $address, $city_id, $response_id, $comment, $photo_url, $visit_count, $visit_id]);
     
     header('Location: dashboard.php?msg=Visit updated');
     exit;
@@ -91,6 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php foreach($responses as $resp): ?>
                         <option value="<?= $resp['id'] ?>" <?= $resp['id'] == $visit['response_id'] ? 'selected' : '' ?>><?= htmlspecialchars($resp['label']) ?></option>
                     <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label>Numéro de visite *</label>
+                <select name="visit_count" class="form-select" required>
+                    <?php for ($i = 1; $i <= 10; $i++): ?>
+                        <option value="<?= $i ?>" <?= $i == (int) ($visit['visit_count'] ?? 1) ? 'selected' : '' ?>><?= $i ?></option>
+                    <?php endfor; ?>
                 </select>
             </div>
             <div class="mb-2">

@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = $_POST['address'];
     $city_id = $_POST['city_id'];
     $response_id = $_POST['response_id'];
+    $visit_count = isset($_POST['visit_count']) ? max(1, (int) $_POST['visit_count']) : 1;
     $comment = $_POST['comment'];
     
     $photo_url = $visit['photo_url'];
@@ -44,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("UPDATE visits SET doctor_name = ?, phone_number = ?, address = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, visit_count = COALESCE(visit_count, 0) + 1, last_edited_at = NOW() WHERE id = ?");
-    $stmt->execute([$doctor_name, $phone, $address, $city_id, $response_id, $comment, $photo_url, $visit_id]);
+    $stmt = $pdo->prepare("UPDATE visits SET doctor_name = ?, phone_number = ?, address = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, visit_count = ?, last_edited_at = NOW() WHERE id = ?");
+    $stmt->execute([$doctor_name, $phone, $address, $city_id, $response_id, $comment, $photo_url, $visit_count, $visit_id]);
     
     header('Location: dashboard.php?msg=Visit updated');
     exit;
@@ -55,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="col-md-6 offset-md-3">
         <h3>Editer Visite</h3>
         <p class="text-muted small">Créé le: <?= $visit['created_at'] ?> | Dernière modif: <?= $visit['last_edited_at'] ?? 'Jamais' ?></p>
-        <p class="text-muted small">Nombre de visite: <?= (int) ($visit['visit_count'] ?? 1) ?></p>
         <form action="edit_visit.php?id=<?= $visit_id ?>" method="POST" enctype="multipart/form-data">
             <div class="mb-2">
                 <label>Nom du Docteur *</label>
@@ -90,6 +90,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php foreach($responses as $resp): ?>
                         <option value="<?= $resp['id'] ?>" <?= $resp['id'] == $visit['response_id'] ? 'selected' : '' ?>><?= htmlspecialchars($resp['label']) ?></option>
                     <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label>Numéro de visite *</label>
+                <select name="visit_count" class="form-select" required>
+                    <?php for ($i = 1; $i <= 10; $i++): ?>
+                        <option value="<?= $i ?>" <?= $i == (int) ($visit['visit_count'] ?? 1) ? 'selected' : '' ?>><?= $i ?></option>
+                    <?php endfor; ?>
                 </select>
             </div>
             <div class="mb-2">

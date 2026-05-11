@@ -63,6 +63,8 @@ if ($method === 'GET') {
         exit;
     }
     
+    $visitCount = isset($data['visit_count']) ? max(1, (int) $data['visit_count']) : 1;
+
     $stmt = $pdo->prepare("INSERT INTO visits (doctor_name, phone_number, address, latitude, longitude, city_id, response_id, comment, visit_count, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $success = $stmt->execute([
         $data['doctor_name'],
@@ -73,7 +75,7 @@ if ($method === 'GET') {
         $data['city_id'],
         $data['response_id'],
         $data['comment'] ?? null,
-        1,
+        $visitCount,
         $user['id']
     ]);
     

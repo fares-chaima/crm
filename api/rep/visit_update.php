@@ -19,10 +19,11 @@ if (!$visit) {
 
 repEnsureCityAllowed($pdo, $repId, (int) $data['city_id']);
 $photoUrl = repHandleUploadedPhoto('photo', $visit['photo_url'] ?? null);
+$visitCount = isset($data['visit_count']) ? max(1, (int) $data['visit_count']) : (int) ($visit['visit_count'] ?? 1);
 
 $stmt = $pdo->prepare(
     'UPDATE visits
-    SET doctor_name = ?, phone_number = ?, address = ?, latitude = ?, longitude = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, visit_count = COALESCE(visit_count, 0) + 1, last_edited_at = NOW()
+    SET doctor_name = ?, phone_number = ?, address = ?, latitude = ?, longitude = ?, city_id = ?, response_id = ?, comment = ?, photo_url = ?, visit_count = ?, last_edited_at = NOW()
      WHERE id = ? AND created_by = ?'
 );
 $stmt->execute([
@@ -35,6 +36,7 @@ $stmt->execute([
     (int) $data['response_id'],
     $data['comment'] ?? null,
     $photoUrl,
+    $visitCount,
     $visitId,
     $repId,
 ]);
