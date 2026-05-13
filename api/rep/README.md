@@ -6,6 +6,8 @@ Base URL: `crm/api/rep/`
   - Authentifie un commercial et retourne un token Bearer.
 - `GET meta.php`
   - Retourne les villes affectees au commercial et les types de reponse.
+- `GET responses.php`
+  - Retourne uniquement les types de reponse (statuts) avec leurs couleurs.
 - `GET visits.php`
   - Retourne la liste des visites du commercial.
   - Filtres supportes: `city_id`, `response_id`, `period`.
