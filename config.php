@@ -1,13 +1,13 @@
 <?php
 // ── Base de données ──────────────────────────────────────────
 define('DB_HOST',    'localhost');
-define('DB_NAME',    'crm_visits');
-define('DB_USER',    'root');
-define('DB_PASS',    '');
+define('DB_NAME',    'u111673431_crm');   // ← à modifier en production
+define('DB_USER',    'u111673431_crm');         // ← à modifier en production
+define('DB_PASS',    'CChaima.24');
 define('DB_CHARSET', 'utf8mb4');
 
 // ── Environnement ────────────────────────────────────────────
-define('APP_ENV', 'development');
+define('APP_ENV', 'production');
 
 // ── URL de base ──────────────────────────────────────────────
 define('APP_BASE_URL', '');
