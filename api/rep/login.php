@@ -1,6 +1,7 @@
 <?php
 require_once '../../includes/api_helpers.php';
 
+apiRequireMethod(['POST']);
 $data = apiGetRequestData();
 
 repValidateRequiredFields($data, ['email', 'password']);
@@ -17,7 +18,7 @@ if (($user['role'] ?? null) !== 'rep') {
     apiJsonResponse(['success' => false, 'error' => 'Ce compte nest pas un commercial'], 403);
 }
 
-$token = base64_encode($user['id'] . ':' . bin2hex(random_bytes(16)));
+$token = apiIssueUserToken($user);
 
 apiJsonResponse([
     'success' => true,

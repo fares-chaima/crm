@@ -4,10 +4,7 @@ require_once '../../includes/api_helpers.php';
 $user = apiRequireBearerUser($pdo, 'rep');
 $repId = (int) $user['id'];
 
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
-    apiJsonResponse(['success' => false, 'error' => 'Methode non autorisee'], 405);
-}
-
+apiRequireMethod(['POST']);
 $data = apiGetRequestData();
 repValidateRequiredFields($data, ['id', 'doctor_name', 'latitude', 'longitude', 'city_id', 'response_id']);
 

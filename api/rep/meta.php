@@ -1,6 +1,7 @@
 <?php
 require_once '../../includes/api_helpers.php';
 
+apiRequireMethod(['GET']);
 $user = apiRequireBearerUser($pdo, 'rep');
 
 apiJsonResponse([

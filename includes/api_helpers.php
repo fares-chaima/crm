@@ -1,6 +1,19 @@
 <?php
 require_once __DIR__ . '/db_connect.php';
 
+function apiInit(): void
+{
+    header('Content-Type: application/json; charset=UTF-8');
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, Accept');
+
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+        http_response_code(204);
+        exit;
+    }
+}
+
 function apiJsonResponse($payload, int $statusCode = 200): void
 {
     http_response_code($statusCode);
@@ -9,13 +22,49 @@ function apiJsonResponse($payload, int $statusCode = 200): void
     exit;
 }
 
-function apiGetBearerToken(): ?string
+function apiGetHeaders(): array
 {
     $headers = function_exists('getallheaders') ? getallheaders() : [];
-    $authorization = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+
+    if (function_exists('apache_request_headers')) {
+        $apacheHeaders = apache_request_headers();
+        if (is_array($apacheHeaders)) {
+            $headers = array_merge($apacheHeaders, $headers);
+        }
+    }
+
+    foreach ($_SERVER as $key => $value) {
+        if (strpos($key, 'HTTP_') !== 0 || !is_string($value)) {
+            continue;
+        }
+
+        $headerName = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));
+        if (!isset($headers[$headerName])) {
+            $headers[$headerName] = $value;
+        }
+    }
+
+    return $headers;
+}
+
+function apiGetBearerToken(): ?string
+{
+    $headers = apiGetHeaders();
+    $authorization = null;
+
+    foreach ($headers as $key => $value) {
+        if (strcasecmp((string) $key, 'Authorization') === 0) {
+            $authorization = $value;
+            break;
+        }
+    }
 
     if (!$authorization && isset($_SERVER['HTTP_AUTHORIZATION'])) {
         $authorization = $_SERVER['HTTP_AUTHORIZATION'];
+    }
+
+    if (!$authorization && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $authorization = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
     }
 
     if (!$authorization || strpos($authorization, 'Bearer ') !== 0) {
@@ -95,6 +144,27 @@ function apiGetRequestData(): array
     return $_POST ?: [];
 }
 
+function apiRequireMethod(array $allowedMethods): string
+{
+    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    $normalizedMethods = array_map('strtoupper', $allowedMethods);
+
+    if (!in_array($method, $normalizedMethods, true)) {
+        apiJsonResponse([
+            'success' => false,
+            'error' => 'Methode non autorisee',
+            'allowed_methods' => $normalizedMethods,
+        ], 405);
+    }
+
+    return $method;
+}
+
+function apiIssueUserToken(array $user): string
+{
+    return base64_encode($user['id'] . ':' . bin2hex(random_bytes(16)));
+}
+
 function repGetAssignedCities(PDO $pdo, int $repId): array
 {
     $stmt = $pdo->prepare(
@@ -116,7 +186,7 @@ function repGetAssignedCityIds(PDO $pdo, int $repId): array
 
 function repGetResponses(PDO $pdo): array
 {
-    $stmt = $pdo->query('SELECT * FROM response_types WHERE is_active = 1 ORDER BY sort_order ASC, label ASC');
+    $stmt = $pdo->query('SELECT id, label, color, is_active, sort_order FROM response_types WHERE is_active = 1 ORDER BY sort_order ASC, label ASC');
     return $stmt->fetchAll();
 }
 
@@ -281,3 +351,5 @@ function repHandleUploadedPhoto(string $fieldName = 'photo', ?string $currentPho
 
     return 'uploads/' . $fileName;
 }
+
+apiInit();

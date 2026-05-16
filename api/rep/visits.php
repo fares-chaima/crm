@@ -3,7 +3,7 @@ require_once '../../includes/api_helpers.php';
 
 $user = apiRequireBearerUser($pdo, 'rep');
 $repId = (int) $user['id'];
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$method = apiRequireMethod(['GET', 'POST']);
 
 if ($method === 'GET') {
     apiJsonResponse([
@@ -18,6 +18,7 @@ if ($method === 'POST') {
 
     repValidateRequiredFields($data, ['doctor_name', 'latitude', 'longitude', 'city_id', 'response_id']);
     repEnsureCityAllowed($pdo, $repId, (int) $data['city_id']);
+    $visitCount = isset($data['visit_count']) ? max(1, (int) $data['visit_count']) : 1;
 
     $stmt = $pdo->prepare(
         'INSERT INTO visits (doctor_name, phone_number, address, latitude, longitude, city_id, response_id, comment, photo_url, visit_count, created_by)
@@ -33,7 +34,7 @@ if ($method === 'POST') {
         (int) $data['response_id'],
         $data['comment'] ?? null,
         $photoUrl,
-        1,
+        $visitCount,
         $repId,
     ]);
 
@@ -42,5 +43,3 @@ if ($method === 'POST') {
         'id' => (int) $pdo->lastInsertId(),
     ], 201);
 }
-
-apiJsonResponse(['success' => false, 'error' => 'Methode non autorisee'], 405);
